@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+	  "module": "commonjs",
+	  "target": "ES2018",
+	  "lib": [ "ESNext" ],
+	  "strict": true,
+	  "strictPropertyInitialization": false,
+	  "typeRoots": [ "node_modules/@types"],
+	  "outDir": "dist",
+	  "rootDir": ".",
+	  "emitDecoratorMetadata": true,
+	  "experimentalDecorators": true,
+	  "removeComments": true,
+	  "declaration": true
+	},
+	"exclude": [
+	  "node_modules",
+	  "extra_types",
+	  "notype",
+	  "dist"
+	]
+  }
+  
