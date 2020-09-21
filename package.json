@@ -5,16 +5,18 @@
   "main": "dist/index.js",
   "dependencies": {
     "class-transformer": "^0.2.3",
-    "class-validator": "^0.12.1",
     "class-transformer-validator": "^0.8.0",
-    "koa": "^2.11.0",
+    "class-validator": "^0.12.2",
+    "koa": "^2.13.0",
+    "koa-bodyparser": "^4.3.0",
     "koa-router": "^8.0.8"
   },
   "devDependencies": {
-    "@types/koa": "^2.11.3",
-    "@types/koa-router": "^7.4.0",
-    "tslib": "^1.11.1",
-    "typescript": "^3.8.3"
+    "@types/koa": "^2.11.4",
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa-router": "^7.4.1",
+    "tslib": "^1.13.0",
+    "typescript": "^3.9.7"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

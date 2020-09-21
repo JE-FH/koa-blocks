@@ -1,10 +1,7 @@
 import * as koa from "koa";
 import * as Router from "koa-router";
 import { transformAndValidate } from "class-transformer-validator";
-import { IsNumber, Min, Max, IsInt, IsNumberString } from "class-validator";
-import { ClassTransformer, Transform } from "class-transformer";
 import * as bodyParser from "koa-bodyparser";
-import * as querystring from "querystring";
 export {ValidationError} from "class-validator";
 
 type ParamValidator = (new (...args: any[]) => any) | null;
