@@ -123,6 +123,9 @@ export class Controller {
 
 					if (route.validator![0] != null) {
 						mod_ctx.request.vparam = await transformAndValidate(route.validator![0], ctx.params);
+						if (!(mod_ctx.request.vparam instanceof route.validator![0])) {
+							throw new Error("Big error :(");
+						}
 					}
 					
 					if (route.validator![1] != null) {
@@ -131,10 +134,16 @@ export class Controller {
 							parsed_query[key] = ctx.query[key];
 						}
 						mod_ctx.request.vquery = await transformAndValidate(route.validator![1], parsed_query);
+						if (!(mod_ctx.request.vquery instanceof route.validator![1])) {
+							throw new Error("Big error :(");
+						}
 					}
 
 					if (route.validator![2] != null) {
 						mod_ctx.request.vbody = await transformAndValidate(route.validator![2], ctx.request.body);
+						if (!(mod_ctx.request.vbody instanceof route.validator![2])) {
+							throw new Error("Big error :(");
+						}
 					} 
 
 					mod_ctx.body = await route.o_handler!(mod_ctx);

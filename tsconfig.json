@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 	  "module": "commonjs",
-	  "target": "ES2018",
+	  "target": "ESNext",
 	  "lib": [ "ESNext" ],
 	  "strict": true,
 	  "strictPropertyInitialization": false,
