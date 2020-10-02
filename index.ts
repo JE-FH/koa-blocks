@@ -16,7 +16,7 @@ interface ValidatedRequest<Param, Query, Body> extends koa.Request {
 	vbody: Body;
 }
 
-export interface ValidatedContext<Param, Query, Body> extends koa.Context {
+export interface ValidatedContext<Param, Query, Body, State = koa.DefaultState> extends koa.ParameterizedContext<State> {
 	request: ValidatedRequest<Param, Query, Body>;
 }
 
