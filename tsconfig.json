@@ -6,13 +6,20 @@
 	  "strict": true,
 	  "strictPropertyInitialization": false,
 	  "typeRoots": [ "node_modules/@types"],
-	  "outDir": "dist",
+	  "outDir": "lib",
 	  "rootDir": ".",
 	  "emitDecoratorMetadata": true,
 	  "experimentalDecorators": true,
 	  "removeComments": true,
 	  "declaration": true
 	},
+	"files": [
+		"src/index.ts",
+		"src/Decorator.ts",
+		"src/ServiceNetwork.ts",
+		"src/services/index.ts",
+		"src/services/SessionService.ts"
+	],
 	"exclude": [
 	  "node_modules",
 	  "extra_types",
