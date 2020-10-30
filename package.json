@@ -1,8 +1,8 @@
 {
   "name": "koa-framework",
   "version": "0.0.5",
-  "description": "a small koa framework used to create mvc web servers",
-  "main": "dist/index.js",
+  "description": "a koa framework used to create mvc web servers",
+  "main": "index.js",
   "dependencies": {
     "class-transformer": "^0.3.1",
     "class-transformer-validator": "^0.9.1",
@@ -24,9 +24,17 @@
   "author": "Jens Emil Fink Højriis",
   "license": "ISC",
   "private": true,
-  "types": "dist/index.d.ts",
+  "types": "index.d.ts",
   "files": [
-    "/dist/index.d.ts",
-    "/dist/index.js"
+    "index.d.ts",
+    "index.js",
+    "Decorator.d.ts",
+    "Decorator.js",
+    "ServiceNetwork.d.ts",
+    "ServiceNetwork.js",
+    "services/index.d.ts",
+    "services/index.js",
+    "services/SessionService.d.ts",
+    "services/SessionService.js"
   ]
 }

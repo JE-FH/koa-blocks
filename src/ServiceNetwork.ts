@@ -6,7 +6,11 @@ export interface Service {
 	 * @param storage_id The key that data should be stored in for every request that goes through the middleware eg. an id of data_1 would mean that data should be stored in `req.state["data_1"]`
 	 * @returns the array of middleware or none if no middlewares are needed
 	 */
-	create_middleware?(storage_id: string): Array<koa.Middleware>;
+	create_middleware(storage_id: string): Array<koa.Middleware>;
+}
+
+export class PassiveService implements Service {
+	create_middleware(storage_id: string): Array<koa.Middleware> {return [];}
 }
 
 type ClassConstructor<T> = ( new (...args: any[]) => T );
@@ -28,19 +32,20 @@ export class ServiceNetwork {
 	}
 
 	/**
-	 * Creates middleware for all the services that require middleware for the given app
-	 * @param app the app to add the middleware to
+	 * Creates middleware for all the services that require middleware
 	 */
-	add_middleware(app: koa) {
+	create_middleware(): Array<koa.Middleware> {
+		let rv: Array<koa.Middleware> = [];
 		this.services.forEach((service, key) => {
 			if (service.service.create_middleware == null || service.middleware_added) {
 				return;
 			}
 			let middlewares = service.service.create_middleware(`data_${(this.last_id++)}`);
 			middlewares.forEach((middleware) => {
-				app.use(middleware);
+				rv.push(middleware);
 			});
 		});
+		return rv;
 	}
 
 	add_service_custom_name<T extends Service>(name: string, service_type: ClassConstructor<T>, service: T): void {

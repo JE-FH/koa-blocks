@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import { Service } from "./../ServiceNetwork"
-import Application = require("koa");
+import koa = require("koa");
 
 function generate_id(): string {
 	return randomBytes(10).toString("hex");
@@ -48,6 +48,9 @@ interface StoreData {
 	data: Map<string, string>;
 }
 
+/**
+ * This store saves data to memory and it will not be persistent, this should only be used for development
+ */
 export class MemoryStore {
 	private data: Map<string, StoreData>
 	constructor() {
@@ -95,7 +98,8 @@ export class SessionService implements Service {
 	 * @param store A class that implements StoreData
 	 */
 	constructor(config: SessionConfig, store: SessionStore) {
-
+		this.config = config;
+		this.store = store;
 	}
 
 	/**
@@ -103,7 +107,7 @@ export class SessionService implements Service {
 	 * @param ctx the context from koa
 	 * @returns the session values, changes in here will be saved when the request ends, if an error occurs it is caught and rethrown after the session has saved
 	 */
-	get_session(ctx: Application.Context): Map<string, string> {
+	get_session(ctx: koa.Context): Map<string, string> {
 		if (this.data_id == null) {
 			throw new Error("Session middleware has not been added yet");
 		}
@@ -113,9 +117,9 @@ export class SessionService implements Service {
 		return ctx.state[this.data_id];
 	}
 
-	create_middleware(data_id: string): Array<Application.Middleware> {
+	create_middleware(data_id: string): Array<koa.Middleware> {
 		this.data_id = data_id;
-		return [async (ctx: Application.Context, next: Application.Next) => {
+		return [async (ctx: koa.Context, next: koa.Next) => {
 			if (this.data_id == null) {
 				throw new Error("Internal error, this.data_id was not set");	
 			}
@@ -162,7 +166,7 @@ export class SessionService implements Service {
  * @param store A class that implements StoreData
  */
 export function session(config: SessionConfig, store: SessionStore) {
-	return async (ctx: Application.ParameterizedContext<SessionState>, next: Application.Next) => {
+	return async (ctx: koa.ParameterizedContext<SessionState>, next: koa.Next) => {
 		//TODO: need to get cookie with right options
 		let id = ctx.cookies.get(config.key);
 		let session_data: Map<string, string> | null = null;
