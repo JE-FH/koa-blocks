@@ -1,5 +1,5 @@
 import * as koa from "koa";
-import * as Router from "koa-router";
+import * as Router from "@koa/router";
 import { transformAndValidate } from "class-transformer-validator";
 export {ValidationError} from "class-validator";
 
@@ -182,7 +182,7 @@ export class Controller {
 					if (route.validator![1] != null) {
 						let parsed_query: Record<string, string | string[]> = {};
 						for (const key of Object.keys(ctx.query)) {
-							parsed_query[key] = ctx.query[key];
+							parsed_query[key] = ctx.query[key]!;
 						}
 						mod_ctx.request.vquery = await transformAndValidate(route.validator![1], parsed_query);
 						if (!(mod_ctx.request.vquery instanceof route.validator![1])) {
@@ -191,9 +191,11 @@ export class Controller {
 					}
 
 					if (route.validator![2] != null) {
-						mod_ctx.request.vbody = await transformAndValidate(route.validator![2], ctx.request.body);
-						if (!(mod_ctx.request.vbody instanceof route.validator![2])) {
-							throw new Error("Big error :(");
+						if (typeof ctx.request.body == "object") {
+							mod_ctx.request.vbody = await transformAndValidate(route.validator![2], ctx.request.body);
+							if (!(mod_ctx.request.vbody instanceof route.validator![2])) {
+								throw new Error("Big error :(");
+							}
 						}
 					} 
 
@@ -204,6 +206,8 @@ export class Controller {
 					ctx.body = await route.o_handler!(ctx);
 				}
 			}
+
+
 			switch (route.method) {
 				case "get":
 					this.__router.get(route.path, route.handler);

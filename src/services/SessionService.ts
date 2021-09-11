@@ -106,6 +106,7 @@ export class SessionService implements Service {
 	 * Get the session for a request
 	 * @param ctx the context from koa
 	 * @returns the session values, changes in here will be saved when the request ends, if an error occurs it is caught and rethrown after the session has saved
+	 * @throws {Error} if the session middleware has not been added correctly
 	 */
 	get_session(ctx: koa.Context): Map<string, string> {
 		if (this.data_id == null) {
@@ -140,22 +141,20 @@ export class SessionService implements Service {
 				try {
 					await next();
 				} catch (e: any) {
-					await this.store.create(id, ctx.state.session, new Date((new Date()).getTime() + this.config.expires));
+					await this.store.create(id, ctx.state[this.data_id], new Date((new Date()).getTime() + this.config.expires));
 					throw e;
 				}
-				await this.store.create(id, ctx.state.session, new Date((new Date()).getTime() + this.config.expires));
+				await this.store.create(id, ctx.state[this.data_id], new Date((new Date()).getTime() + this.config.expires));
 			} else {
 				ctx.state[this.data_id] = session_data;
 				try {
 					await next();
 				} catch (e) {
-					await this.store.set(id, ctx.state.session);
+					await this.store.set(id, ctx.state[this.data_id]);
 					throw e;
 				}
-				await this.store.set(id, ctx.state.session);
+				await this.store.set(id, ctx.state[this.data_id]);
 			}
-
-			await next();
 		}];
 	}
 }
