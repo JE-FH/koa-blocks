@@ -231,12 +231,15 @@ export class AuthenticationService<T> implements Service {
 	/**
 	 * Authenticates a request which sets the user_id in the session so that the session is logged in
 	 * @param ctx the context of the request that sent the login request
-	 * @param stored_authentication
+	 * @param stored_authentication should be a string, but in case that the authentication string is nullable, this makes it easier
 	 * @param password
 	 * @throws {WrongCredentialsError} if the username or password is wrong
 	 * @throws {InvalidAuthenticationString} If the authentication string is corrupt
 	 */
-	async authenticate(ctx: koa.Context, user_id: number, stored_authentication_string: string, password: string) {
+	async authenticate(ctx: koa.Context, user_id: number, stored_authentication_string: string | null | undefined, password: string) {
+		if (stored_authentication_string == null) {
+			throw new InvalidAuthenticationString("authentication string was null");
+		}
 		let session = this.session_service.get_session(ctx);
 
 		if (!(await safe_verify_authentication_string(stored_authentication_string, password, this.config.encodings))) {
