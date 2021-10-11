@@ -109,6 +109,7 @@ export class SessionService implements Service {
 	 * @throws {Error} if the session middleware has not been added correctly
 	 */
 	get_session(ctx: koa.Context): Map<string, string> {
+		//TODO: this should be async so the data is fetched on demand instead
 		if (this.data_id == null) {
 			throw new Error("Session middleware has not been added yet");
 		}

@@ -8,7 +8,7 @@ export interface AuthenticatableUserData {
 	id: number;
 }
 
-interface UserStorage<T> {
+export interface UserStorage<T> {
 	get_by_id(id: number): Promise<T | null>;
 }
 
