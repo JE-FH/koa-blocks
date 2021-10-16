@@ -211,7 +211,7 @@ export class AuthenticationService<T> implements Service {
 	 * @returns The user object or null if not logged in
 	 */
 	async get_user(ctx: koa.Context): Promise<T | null> {
-		let session = this.session_service.get_session(ctx);
+		let session = await this.session_service.get_session(ctx);
 		let user_id = parse_int_safe(session.get("user_id"));
 
 		if (Number.isNaN(user_id)) {
@@ -240,7 +240,7 @@ export class AuthenticationService<T> implements Service {
 		if (stored_authentication_string == null) {
 			throw new InvalidAuthenticationString("authentication string was null");
 		}
-		let session = this.session_service.get_session(ctx);
+		let session = await this.session_service.get_session(ctx);
 
 		if (!(await safe_verify_authentication_string(stored_authentication_string, password, this.config.encodings))) {
 			throw new WrongCredentialsError("Wrong password");

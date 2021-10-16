@@ -1,5 +1,7 @@
 import { randomBytes } from "crypto";
 import { Service } from "./../ServiceNetwork"
+import { strict as assert } from 'assert';
+
 import koa = require("koa");
 
 function generate_id(): string {
@@ -108,15 +110,36 @@ export class SessionService implements Service {
 	 * @returns the session values, changes in here will be saved when the request ends, if an error occurs it is caught and rethrown after the session has saved
 	 * @throws {Error} if the session middleware has not been added correctly
 	 */
-	get_session(ctx: koa.Context): Map<string, string> {
-		//TODO: this should be async so the data is fetched on demand instead
+	async get_session(ctx: koa.Context): Promise<Map<string, string>> {
 		if (this.data_id == null) {
-			throw new Error("Session middleware has not been added yet");
+			throw new Error("Internal error, this.data_id was not set");	
 		}
-		if (!(ctx.state[this.data_id] instanceof Map)) {
-			throw new Error("Session middleware error");
+		
+		if (ctx.state[this.data_id] != null) {
+			assert(typeof(ctx.state[this.data_id]) == "object");
+			assert(ctx.state[this.data_id].data instanceof Map);
+			assert(typeof(ctx.state[this.data_id].key) == "string");
+			return ctx.state[this.data_id].data;
 		}
-		return ctx.state[this.data_id];
+
+		//TODO: need to get cookie with right options
+		let id = ctx.cookies.get(this.config.key);
+		let session_data: Map<string, string> | null = null;
+		if (id != null) {
+			session_data = await this.store.get(id);
+		} else {
+			id = generate_id();
+		}
+		//TODO: need to set cookie with right options
+		ctx.cookies.set(this.config.key, id);
+
+		if (session_data == null) {
+			ctx.state[this.data_id] = {key: id, data: new Map(), create: true};
+			return ctx.state[this.data_id].data;
+		} else {
+			ctx.state[this.data_id] = {key: id, data: session_data, create: false};
+		}
+		return ctx.state[this.data_id].data;
 	}
 
 	create_middleware(data_id: string): Array<koa.Middleware> {
@@ -125,38 +148,32 @@ export class SessionService implements Service {
 			if (this.data_id == null) {
 				throw new Error("Internal error, this.data_id was not set");	
 			}
-			
-			//TODO: need to get cookie with right options
-			let id = ctx.cookies.get(this.config.key);
-			let session_data: Map<string, string> | null = null;
-			if (id != null) {
-				session_data = await this.store.get(id);
-			} else {
-				id = generate_id();
+			try {
+				await next();
+			} catch (e) {
+				await this.save_state(ctx);
+				throw e;
 			}
-			//TODO: need to set cookie with right options
-			ctx.cookies.set(this.config.key, id);
 			
-			if (session_data == null) {
-				ctx.state[this.data_id] = new Map();
-				try {
-					await next();
-				} catch (e: any) {
-					await this.store.create(id, ctx.state[this.data_id], new Date((new Date()).getTime() + this.config.expires));
-					throw e;
-				}
-				await this.store.create(id, ctx.state[this.data_id], new Date((new Date()).getTime() + this.config.expires));
-			} else {
-				ctx.state[this.data_id] = session_data;
-				try {
-					await next();
-				} catch (e) {
-					await this.store.set(id, ctx.state[this.data_id]);
-					throw e;
-				}
-				await this.store.set(id, ctx.state[this.data_id]);
-			}
+			await this.save_state(ctx);
 		}];
+	}
+	
+	private async save_state(ctx: koa.Context) {
+		if (this.data_id == null) {
+			throw new Error("Internal error, this.data_id was not set");	
+		}
+		if (ctx.state[this.data_id] == null) {
+			return;
+		}
+		assert(typeof(ctx.state[this.data_id]) == "object");
+		assert(ctx.state[this.data_id].data instanceof Map);
+		assert(typeof(ctx.state[this.data_id].key) == "string");
+		if (ctx.state[this.data_id].create === true) {
+			await this.store.create(ctx.state[this.data_id].key, ctx.state[this.data_id].data, new Date((new Date()).getTime() + this.config.expires));
+		} else {
+			await this.store.set(ctx.state[this.data_id].key, ctx.state[this.data_id].data);
+		}
 	}
 }
 
