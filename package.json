@@ -39,5 +39,9 @@
     "services/UserService.js",
     "services/AuthenticationService.d.ts",
     "services/AuthenticationService.js"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JE-FH/koa-blocks.git"
+  }
 }
