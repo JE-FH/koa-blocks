@@ -173,7 +173,12 @@ export class Controller {
 					mod_ctx.request.vbody = null;
 
 					if (route.validator![0] != null) {
-						mod_ctx.request.vparam = await transformAndValidate(route.validator![0], ctx.params);
+						mod_ctx.request.vparam = await transformAndValidate(route.validator![0], ctx.params, {
+							//Fixes CVE-2019-18413 since class-validator doesnt validate classes correctly unless this is added and they refuse to fix
+							validator: {
+								forbidUnknownValues: true
+							}
+						});
 						if (!(mod_ctx.request.vparam instanceof route.validator![0])) {
 							throw new Error("Big error :(");
 						}
@@ -184,7 +189,11 @@ export class Controller {
 						for (const key of Object.keys(ctx.query)) {
 							parsed_query[key] = ctx.query[key]!;
 						}
-						mod_ctx.request.vquery = await transformAndValidate(route.validator![1], parsed_query);
+						mod_ctx.request.vquery = await transformAndValidate(route.validator![1], parsed_query, {
+							validator: {
+								forbidUnknownValues: true
+							}
+						});
 						if (!(mod_ctx.request.vquery instanceof route.validator![1])) {
 							throw new Error("Big error :(");
 						}
@@ -192,7 +201,11 @@ export class Controller {
 
 					if (route.validator![2] != null) {
 						if (typeof ctx.request.body == "object") {
-							mod_ctx.request.vbody = await transformAndValidate(route.validator![2], ctx.request.body);
+							mod_ctx.request.vbody = await transformAndValidate(route.validator![2], ctx.request.body, {
+								validator: {
+									forbidUnknownValues: true
+								}
+							});
 							if (!(mod_ctx.request.vbody instanceof route.validator![2])) {
 								throw new Error("Big error :(");
 							}
